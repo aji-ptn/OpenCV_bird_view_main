@@ -19,11 +19,15 @@ class CalibProperties:
         # self.config_image_5 = ConfigurationImage5(self.view_controller)
         # self.config_image_6 = ConfigurationImage6(self.view_controller)
 
-        self.view_controller.main_ui.button_save_config.clicked.connect(self.view_controller.controller.save_config_to_file)
+        self.view_controller.main_ui.button_save_config.clicked.connect(self.save_data_configuration)
         self.view_controller.main_ui.button_load_config.clicked.connect(self.load_configuration)
 
+    def save_data_configuration(self):
+        self.view_controller.controller.save_config_to_file(self.view_controller.appctxt.get_resource("data_config"
+                                                                                                      "/config.yaml"))
+
     def load_configuration(self):
-        config_path = "/home/aji/Documents/MyGithub/opencv_bird_view/config.yaml"
+        config_path = self.view_controller.appctxt.get_resource("data_config/config.yaml")
         # config_path = select_file(self.view_controller, "Select config !!", "../data_config",
         #                           "config file (*.yaml)")
         if config_path is not None:

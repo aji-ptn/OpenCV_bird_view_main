@@ -4,21 +4,24 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
 from .ui_py.main_ui import Ui_MainWindow
 from .additional_function import select_file, init_ori_ratio, show_image_to_label
+from .ui_authentication_controller import AuthenticationPassword
 from .calib_properties import CalibProperties
 from .show_to_windows import ShowToUi
 from .additional_ui import AdditionalButton
 
 
 class MainView(QMainWindow):
-    def __init__(self, model, controller):
+    def __init__(self, parent, appctxt, model, controller):
         super(MainView, self).__init__()
         self.main_ui = Ui_MainWindow()
-        self.main_ui.setupUi(self)
+        self.main_ui.setupUi(parent)
 
         self.model = model
         self.controller = controller
+        self.appctxt = appctxt
         self.additional_button = AdditionalButton(self)
         # self.additional_button
+        self.config_path_authentication = self.appctxt.get_resource('data/data.yaml')
         self.calib_properties = CalibProperties(self)
         self.show_to_ui = ShowToUi(self)
         self.main_ui.wind_show_undistortion_point.setMouseTracking(True)
@@ -38,6 +41,22 @@ class MainView(QMainWindow):
     def hide(self):
         self.main_ui.toolBox.setItemEnabled(4, False)
         self.main_ui.toolBox.setItemEnabled(5, False)
+        self.main_ui.label_38.hide()
+        self.main_ui.spinBox_shift_x_1.hide()
+        self.main_ui.label_40.hide()
+        self.main_ui.spinBox_shift_y_1.hide()
+        self.main_ui.label_41.hide()
+        self.main_ui.spinBox_shift_x_2.hide()
+        self.main_ui.label_42.hide()
+        self.main_ui.spinBox_shift_y_2.hide()
+        self.main_ui.label_219.hide()
+        self.main_ui.spinBox_shift_x_3.hide()
+        self.main_ui.label_220.hide()
+        self.main_ui.spinBox_shift_y_3.hide()
+        self.main_ui.label_223.hide()
+        self.main_ui.spinBox_shift_x_5.hide()
+        self.main_ui.label_224.hide()
+        self.main_ui.spinBox_shift_y_5.hide()
 
     def connect(self):
         self.main_ui.button_open_image.clicked.connect(self.open_image)
@@ -61,6 +80,7 @@ class MainView(QMainWindow):
 
     def open_image(self):
         self.model.total_camera_used = 4
+        self.check_authentication()
         self.controller.initial_properties()
         self.calib_properties.update_config()
         QMessageBox.information(None, "Information", "Select Source and parameter Image\nImage front -> left -> right "
@@ -87,6 +107,19 @@ class MainView(QMainWindow):
             pass
         self.calib_properties.set_intrinsic_parameter_to_ui()
         print(self.model.properties_image)
+
+    def check_authentication(self):
+        self.controller.load_config_authentication(self.config_path_authentication)
+        status = self.controller.authentication()
+        if not status:
+            auth_config = QtWidgets.QDialog()
+            source_cam = AuthenticationPassword(auth_config, self)
+            auth_config.exec()
+            if source_cam is not None:
+                status = self.controller.authentication(source_cam.password)
+                if status:
+                    self.controller.save_config_authentication(source_cam.password, self.config_path_authentication)
+                    print("done")
 
     def activate_toolbox(self):
         index = self.main_ui.toolBox.currentIndex()

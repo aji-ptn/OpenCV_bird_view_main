@@ -4,6 +4,7 @@ from .additional_function import read_image
 import cv2
 from .merge_original_image import merge_original_image
 import yaml
+from subprocess import call
 
 
 class MainController:
@@ -90,13 +91,13 @@ class MainController:
         self.data_config = True
         self.model.properties_image = data_config
 
-    def save_config_to_file(self):
-        print("here")
+    def save_config_to_file(self, data):
+        print("save")
         properties_image = self.model.properties_image
         # properties_image["camera_used"] = self.model.total_camera_used
         # properties_image["camera_placement"] = self.model.camera_placement
         print(properties_image)
-        with open("data_config/config.yaml", "w") as outfile:
+        with open(data, "w") as outfile:
             yaml.dump(properties_image, outfile, default_flow_style=False)
 
     def process_perspective_image(self, i):
@@ -301,3 +302,34 @@ class MainController:
         self.model.properties_image[keys[i_image]]["src"]["point4_y"] = data[3][1]
         print(self.model.properties_image[keys[i_image]]["src"])
 
+    def load_config_authentication(self, data_config):
+        with open(data_config, "r") as file:
+            data = yaml.safe_load(file)
+
+        self.authen = data
+
+    def authentication(self, password_in=None):
+        if password_in is not None:
+            self.authen["data"] = password_in
+            password = password_in
+        else:
+            password = self.authen["data"]
+
+        # result = os.system("echo '{}' | sudo -Si".format(str(password.strip())))  # important: strip() the newline char
+        cmd = 'chmod -R 777 /opt/MoilDash'
+        result = call('echo {} | sudo -S {}'.format(password, cmd), shell=True)
+
+        if result == "0" or result == 0:
+            status = True
+        else:
+            status = False
+        return status
+
+    def save_config_authentication(self, d_password, file):
+        # encMessage = self.encrypting_data(d_password)
+        # self.data = encMessage
+        self.authen["data"] = d_password
+        # file = self..app_ctxt.get_resource("data/data.yaml")
+        with open(file, "w") as outfile:
+            yaml.dump(self.authen, outfile, default_flow_style=False)
+            print("save config success")

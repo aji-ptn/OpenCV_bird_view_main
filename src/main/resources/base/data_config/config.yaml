@@ -10,22 +10,22 @@ Image_1:
     Height: 1010
     Width: 2592
     point1_x: 920
-    point1_y: 456
+    point1_y: 465
     point2_x: 1639
-    point2_y: 461
+    point2_y: 465
     point3_x: 921
-    point3_y: 803
+    point3_y: 783
     point4_x: 1625
     point4_y: 783
   src:
-    point1_x: 1428
-    point1_y: 142
-    point2_x: 1631
-    point2_y: 152
-    point3_x: 1256
-    point3_y: 268
-    point4_x: 1799
-    point4_y: 296
+    point1_x: 1448
+    point1_y: 134
+    point2_x: 1613
+    point2_y: 142
+    point3_x: 1204
+    point3_y: 314
+    point4_x: 1844
+    point4_y: 331
 Image_2:
   Ins:
     Fx: 151.0
