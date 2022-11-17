@@ -8,6 +8,7 @@ from .ui_authentication_controller import AuthenticationPassword
 from .calib_properties import CalibProperties
 from .show_to_windows import ShowToUi
 from .additional_ui import AdditionalButton
+from .ui_video_controller import UiVideoController
 
 
 class MainView(QMainWindow):
@@ -18,14 +19,13 @@ class MainView(QMainWindow):
 
         self.model = model
         self.controller = controller
-        self.appctxt = appctxt
+        self.app_ctxt = appctxt
         self.additional_button = AdditionalButton(self)
-        # self.additional_button
-        self.config_path_authentication = self.appctxt.get_resource('data/data.yaml')
+        self.config_path_authentication = self.app_ctxt.get_resource('data/data.yaml')
         self.calib_properties = CalibProperties(self)
         self.show_to_ui = ShowToUi(self)
         self.main_ui.wind_show_undistortion_point.setMouseTracking(True)
-
+        self.ui_video_controller = UiVideoController(self)
         self.list_btn_point = [self.main_ui.button_select_point_0, self.main_ui.button_select_point_1,
                                self.main_ui.button_select_point_2, self.main_ui.button_select_point_3]
         self.list_add_value_src_to_ui = [self.calib_properties.config_image_1,
@@ -41,22 +41,22 @@ class MainView(QMainWindow):
     def hide(self):
         self.main_ui.toolBox.setItemEnabled(4, False)
         self.main_ui.toolBox.setItemEnabled(5, False)
-        self.main_ui.label_38.hide()
-        self.main_ui.spinBox_shift_x_1.hide()
-        self.main_ui.label_40.hide()
-        self.main_ui.spinBox_shift_y_1.hide()
-        self.main_ui.label_41.hide()
-        self.main_ui.spinBox_shift_x_2.hide()
-        self.main_ui.label_42.hide()
-        self.main_ui.spinBox_shift_y_2.hide()
-        self.main_ui.label_219.hide()
-        self.main_ui.spinBox_shift_x_3.hide()
-        self.main_ui.label_220.hide()
-        self.main_ui.spinBox_shift_y_3.hide()
-        self.main_ui.label_223.hide()
-        self.main_ui.spinBox_shift_x_5.hide()
-        self.main_ui.label_224.hide()
-        self.main_ui.spinBox_shift_y_5.hide()
+        # self.main_ui.label_38.hide()
+        # self.main_ui.spinBox_shift_x_1.hide()
+        # self.main_ui.label_40.hide()
+        # self.main_ui.spinBox_shift_y_1.hide()
+        # self.main_ui.label_41.hide()
+        # self.main_ui.spinBox_shift_x_2.hide()
+        # self.main_ui.label_42.hide()
+        # self.main_ui.spinBox_shift_y_2.hide()
+        # self.main_ui.label_219.hide()
+        # self.main_ui.spinBox_shift_x_3.hide()
+        # self.main_ui.label_220.hide()
+        # self.main_ui.spinBox_shift_y_3.hide()
+        # self.main_ui.label_223.hide()
+        # self.main_ui.spinBox_shift_x_5.hide()
+        # self.main_ui.label_224.hide()
+        # self.main_ui.spinBox_shift_y_5.hide()
 
     def connect(self):
         self.main_ui.button_open_image.clicked.connect(self.open_image)
@@ -94,14 +94,14 @@ class MainView(QMainWindow):
                 if path_parameter:
                     self.controller.list_intrinsic_data(path_parameter)
                     self.controller.list_image_data(path_image, i)
-                    if self.controller.data_config is None:
+                    if self.model.data_config is None:
                         self.controller.update_intrinsic_parameter(i)
                     self.controller.process_undistorted_image(i)
                     self.controller.process_perspective_image(i)
                     self.show_to_ui.show_union_original_image()
                     self.show_to_ui.show_image_current_calib()
         try:
-            self.controller.process_bird_view("bird_view")
+            self.model.overlap_image = self.controller.process_bird_view("bird_view", "image")
             self.show_to_ui.show_bird_view_image()
         except:
             pass
@@ -132,9 +132,9 @@ class MainView(QMainWindow):
 
     def change_overlap_or_bird_view(self):
         if self.main_ui.checkBox_show_overlapping.isChecked():
-            self.controller.process_bird_view("overlap")
+            self.model.overlap_image = self.controller.process_bird_view("overlap", "image")
         else:
-            self.controller.process_bird_view("bird_view")
+            self.model.overlap_image = self.controller.process_bird_view("bird_view", "image")
         self.show_to_ui.show_bird_view_image()
 
     def add_label_zoom(self):

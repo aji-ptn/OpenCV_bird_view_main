@@ -3,32 +3,36 @@ import numpy as np
 from .additional_function import read_image
 import cv2
 from .merge_original_image import merge_original_image
+from .video_controller import VideoController
 import yaml
 from subprocess import call
 
 
 class MainController:
-    def __init__(self, model):
+    def __init__(self, appctx, model):
         """
 
         Args:
             model:
         """
         super(MainController, self).__init__()
+        self.app_ctxt = appctx
         self.model = model
+        self.video_controller = VideoController(self.app_ctxt, self)
 
-        self.matrix_k = []
-        self.coefficient = []
-        self.dimension = []
-        self.data_config = None
+        # self.matrix_k = []
+        # self.coefficient = []
+        # self.dimension = []
+        # self.data_config = None
 
     def initial_properties(self):
-        self.matrix_k = []
-        self.coefficient = []
-        self.dimension = []
-        if self.data_config is None:
+        # self.matrix_k = []
+        # self.coefficient = []
+        # self.dimension = []
+        if self.model.data_config is None:
             self.model.properties_image = {}
         cam_total = self.model.total_camera_used
+        self.model.calibration_image = {"matrix_k": [], "new_matrix_k": [], "dis_coefficient": [], "dimension": []}
         self.model.list_original_image = []
         self.model.list_original_undistorted_image = [None] * cam_total
         self.model.list_undistorted_image = [None] * cam_total
@@ -43,43 +47,63 @@ class MainController:
 
     def list_intrinsic_data(self, path_parameter):
         K, D, dimension = self.read_parameter(path_parameter)
-        self.matrix_k.append(K)
-        self.coefficient.append(D)
-        self.dimension.append(dimension)
+        print(K, D, list(dimension))
+        print(self.model.data_config)
+        print(self.model.calibration_image)
+        # print(self.model.calibration_image["matrix_k"])
+        self.model.calibration_image["matrix_k"].append(K)
+        self.model.calibration_image["dis_coefficient"].append(D)
+        self.model.calibration_image["dimension"].append(dimension)
+        print("==============================")
+        print(self.model.calibration_image["dimension"])
+        print("==============================")
 
     def update_union_original_image(self):
         self.model.union_original_image = merge_original_image(self.model.list_original_image)
 
     def update_intrinsic_parameter(self, i):
         keys = list(self.model.properties_image)
-        self.model.properties_image[keys[i]]["Ins"]["Fx"] = float(self.matrix_k[i][0][0])
-        self.model.properties_image[keys[i]]["Ins"]["Fy"] = float(self.matrix_k[i][1][1])
-        self.model.properties_image[keys[i]]["Ins"]["Icx"] = float(self.matrix_k[i][0][2])
-        self.model.properties_image[keys[i]]["Ins"]["Icy"] = float(self.matrix_k[i][1][2])
-        self.model.properties_image[keys[i]]["Ins"]["Width"] = int(self.dimension[i][0])
-        self.model.properties_image[keys[i]]["Ins"]["Height"] = int(self.dimension[i][1])
+        self.model.properties_image[keys[i]]["Ins"]["Fx"] = float(self.model.calibration_image["matrix_k"][i][0][0])
+        self.model.properties_image[keys[i]]["Ins"]["Fy"] = float(self.model.calibration_image["matrix_k"][i][1][1])
+        self.model.properties_image[keys[i]]["Ins"]["Icx"] = float(self.model.calibration_image["matrix_k"][i][0][2])
+        self.model.properties_image[keys[i]]["Ins"]["Icy"] = float(self.model.calibration_image["matrix_k"][i][1][2])
+        self.model.properties_image[keys[i]]["Ins"]["Width"] = int(self.model.calibration_image["dimension"][i][0])
+        self.model.properties_image[keys[i]]["Ins"]["Height"] = int(self.model.calibration_image["dimension"][i][1])
 
     def process_undistorted_image(self, i):
         keys = list(self.model.properties_image)
-        new_matrix = self.matrix_k[i].copy()
+        new_matrix = self.model.calibration_image["matrix_k"][i].copy()
         new_matrix[0, 0] = self.model.properties_image[keys[i]]["Ins"]["Fx"]
         new_matrix[1, 1] = self.model.properties_image[keys[i]]["Ins"]["Fy"]
         new_matrix[0, 2] = self.model.properties_image[keys[i]]["Ins"]["Icx"]
         new_matrix[1, 2] = self.model.properties_image[keys[i]]["Ins"]["Icy"]
 
+        self.model.calibration_image["new_matrix_k"] = new_matrix
+
         width = self.model.properties_image[keys[i]]["Ins"]["Width"]
         height = self.model.properties_image[keys[i]]["Ins"]["Height"]
-        map1, map2 = cv2.fisheye.initUndistortRectifyMap(self.matrix_k[i], self.coefficient[i], np.eye(3),
-                                                         new_matrix, (width, height), cv2.CV_16SC2)
+        map1, map2 = cv2.fisheye.initUndistortRectifyMap(self.model.calibration_image["matrix_k"][i],
+                                                         self.model.calibration_image["dis_coefficient"][i], np.eye(3),
+                                                         self.model.calibration_image["new_matrix_k"],
+                                                         (width, height), cv2.CV_16SC2)
+
+        path_map_x_anypoint = self.app_ctxt.get_resource("data_config/maps/map_x_" + str(i) + ".npy")
+        path_map_y_anypoint = self.app_ctxt.get_resource("data_config/maps/map_y_" + str(i) + ".npy")
+
+        np.save(path_map_x_anypoint, map1)
+        np.save(path_map_y_anypoint, map2)
+
         undistorted = cv2.remap(self.model.list_original_image[i], map1, map2,
                                 interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
         self.model.list_undistorted_image[i] = undistorted
         self.draw_point_position("src", keys, i)
 
     def process_original_undistorted(self, i):
-        width, height = self.dimension[i]
-        map1, map2 = cv2.fisheye.initUndistortRectifyMap(self.matrix_k[i], self.coefficient[i], np.eye(3),
-                                                         self.matrix_k[i], (int(width), int(height)),
+        width, height = self.model.calibration_image["dimension"][i]
+        map1, map2 = cv2.fisheye.initUndistortRectifyMap(self.model.calibration_image["matrix_k"][i],
+                                                         self.model.calibration_image["dis_coefficient"][i], np.eye(3),
+                                                         self.model.calibration_image["matrix_k"][i],
+                                                         (int(width), int(height)),
                                                          cv2.CV_16SC2)
         self.model.list_original_undistorted_image[i] = cv2.remap(self.model.list_original_image[i], map1, map2,
                                                                   interpolation=cv2.INTER_LINEAR,
@@ -88,7 +112,7 @@ class MainController:
     def load_config(self, config_file):
         with open(config_file, "r") as file:
             data_config = yaml.safe_load(file)
-        self.data_config = True
+        self.model.data_config = True
         self.model.properties_image = data_config
 
     def save_config_to_file(self, data):
@@ -179,12 +203,16 @@ class MainController:
 
         return K, D, dimension
 
-    def process_bird_view(self, activation):
+    def process_bird_view(self, activation, image_sources):
+        if image_sources == "image":
+            image = self.model.list_perspective_image
+        else:
+            image = self.model.list_perspective_video
         print("Bird view")
-        image = [self.model.list_perspective_image[0],
-                 cv2.rotate(self.model.list_perspective_image[1], cv2.ROTATE_90_COUNTERCLOCKWISE),
-                 cv2.rotate(self.model.list_perspective_image[2], cv2.ROTATE_90_CLOCKWISE),
-                 cv2.rotate(self.model.list_perspective_image[3], cv2.ROTATE_180)]
+        image = [image[0],
+                 cv2.rotate(image[1], cv2.ROTATE_90_COUNTERCLOCKWISE),
+                 cv2.rotate(image[2], cv2.ROTATE_90_CLOCKWISE),
+                 cv2.rotate(image[3], cv2.ROTATE_180)]
 
         if image[3].shape[1] == image[0].shape[1] and image[2].shape[0] == image[1].shape[0]:
             canvas_bird_view = np.zeros([image[1].shape[0], image[0].shape[1], 3], dtype=np.uint8)
@@ -200,7 +228,7 @@ class MainController:
             canvas_bird_view[0:0 + image[2].shape[0], right_limit:right_limit + image[2].shape[1]] = image[2]
             canvas_bird_view[0:0 + image[0].shape[0], 0:0 + image[0].shape[1]] = image[0]
             canvas_bird_view[rear_limit:rear_limit + image[3].shape[0], 0:0 + image[3].shape[1]] = image[3]
-            self.model.overlap_image = canvas_bird_view
+            # self.model.overlap_image = canvas_bird_view
 
             if activation == "overlap":
                 list_overlapping = self.transparency_bird_view(image, right_limit, rear_limit)
@@ -214,12 +242,14 @@ class MainController:
                 image[3].shape[1] - image[2].shape[1]
                 : image[3].shape[1] - image[2].shape[1] +
                   list_overlapping[3].shape[1]] = list_overlapping[3]  # right rear
-                self.model.overlap_image = canvas_bird_view
+                # self.model.overlap_image = canvas_bird_view
 
             else:
                 canvas_bird_view = self.bird_view_combine_overlapping(image)
                 canvas_bird_view = cv2.cvtColor(canvas_bird_view, cv2.COLOR_BGRA2BGR)
-                self.model.overlap_image = canvas_bird_view
+                # self.model.overlap_image = canvas_bird_view
+
+            return canvas_bird_view
 
     @classmethod
     def transfer(cls, src):
@@ -229,11 +259,11 @@ class MainController:
         b, g, r = cv2.split(src)
         rgba = [b, g, r, alpha]
         dst = cv2.merge(rgba, 4)
-        cv2.imwrite("image.jpg", dst)
+        # cv2.imwrite("image.jpg", dst)
         return dst
 
     def bird_view_combine_overlapping(self, image):
-        cv2.imwrite("image1.jpg", image[3])
+        # cv2.imwrite("image1.jpg", image[3])
         for i in range(len(image)):
             image[i] = self.transfer(image[i])
 

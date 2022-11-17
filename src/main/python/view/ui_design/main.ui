@@ -3085,6 +3085,9 @@
              <property name="text">
               <string>Rec</string>
              </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -3131,11 +3134,56 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_17">
            <item>
+            <layout class="QGridLayout" name="gridLayout_18">
+             <item row="0" column="0">
+              <widget class="QRadioButton" name="radioButton_horizontal_video">
+               <property name="text">
+                <string>Horizontal</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QRadioButton" name="radioButton_diagonal_video">
+               <property name="text">
+                <string>Diagonal</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QRadioButton" name="radioButton_vertical_video">
+               <property name="text">
+                <string>Vertical</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QRadioButton" name="radioButton_overlap_video">
+               <property name="text">
+                <string>Overlap</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
             <widget class="QCheckBox" name="checkBox_show_overlap_video">
              <property name="text">
-              <string>Show Overlap</string>
+              <string>Overlap</string>
              </property>
             </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_15">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </item>
@@ -3150,7 +3198,7 @@
               <x>0</x>
               <y>0</y>
               <width>521</width>
-              <height>740</height>
+              <height>709</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -3231,7 +3279,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QPushButton" name="btn_rewind">
+             <widget class="QPushButton" name="btn_prev_video">
               <property name="maximumSize">
                <size>
                 <width>30</width>
@@ -3254,6 +3302,9 @@
               <property name="text">
                <string>Play</string>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -3270,7 +3321,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_forward">
+             <widget class="QPushButton" name="btn_skip_video">
               <property name="maximumSize">
                <size>
                 <width>30</width>
@@ -3283,7 +3334,23 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_36">
+             <widget class="QPushButton" name="btn_Full_view">
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>[F]</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_time_recent">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -3296,14 +3363,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QSlider" name="horizontalSlider_video">
+             <widget class="QSlider" name="slider_video">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_37">
+             <widget class="QLabel" name="label_time_end">
               <property name="minimumSize">
                <size>
                 <width>50</width>

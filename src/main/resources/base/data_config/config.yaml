@@ -1,114 +1,114 @@
 Image_1:
   Ins:
-    Fx: 134.0
-    Fy: 134.25
-    Height: 2612
-    Icx: 1529.75
+    Fx: 135.0
+    Fy: 138.69
+    Height: 1944
+    Icx: 1296.0
     Icy: 98.0
-    Width: 4000
-  dst:
-    Height: 1010
     Width: 2592
-    point1_x: 920
-    point1_y: 465
-    point2_x: 1639
-    point2_y: 465
-    point3_x: 921
-    point3_y: 783
-    point4_x: 1625
-    point4_y: 783
+  dst:
+    Height: 927
+    Width: 2592
+    point1_x: 946
+    point1_y: 300
+    point2_x: 1646
+    point2_y: 300
+    point3_x: 946
+    point3_y: 700
+    point4_x: 1646
+    point4_y: 700
   src:
-    point1_x: 1448
-    point1_y: 134
-    point2_x: 1613
-    point2_y: 142
-    point3_x: 1204
-    point3_y: 314
-    point4_x: 1844
-    point4_y: 331
+    point1_x: 1245
+    point1_y: 128
+    point2_x: 1349
+    point2_y: 126
+    point3_x: 1195
+    point3_y: 223
+    point4_x: 1404
+    point4_y: 218
 Image_2:
   Ins:
     Fx: 151.0
     Fy: 150.31
-    Height: 2337
-    Icx: 5000.0
+    Height: 1944
+    Icx: 1296.0
     Icy: 83.0
-    Width: 6000
+    Width: 2592
   dst:
     Height: 960
-    Width: 3657
-    point1_x: 1724
-    point1_y: 426
-    point2_x: 2604
-    point2_y: 423
-    point3_x: 1703
-    point3_y: 787
-    point4_x: 2607
-    point4_y: 787
+    Width: 4500
+    point1_x: 2350
+    point1_y: 200
+    point2_x: 3050
+    point2_y: 200
+    point3_x: 2350
+    point3_y: 640
+    point4_x: 3050
+    point4_y: 640
   src:
-    point1_x: 4807
-    point1_y: 190
-    point2_x: 5126
-    point2_y: 162
-    point3_x: 4326
-    point3_y: 511
-    point4_x: 5329
-    point4_y: 316
+    point1_x: 1299
+    point1_y: 130
+    point2_x: 1408
+    point2_y: 126
+    point3_x: 1308
+    point3_y: 236
+    point4_x: 1503
+    point4_y: 225
 Image_3:
   Ins:
     Fx: 151.0
-    Fy: 150.31
-    Height: 2337
-    Icx: 3002.0
+    Fy: 153.84
+    Height: 1944
+    Icx: 1294.0
     Icy: 83.0
-    Width: 4000
+    Width: 2592
   dst:
-    Height: 973
-    Width: 3657
-    point1_x: 1064
-    point1_y: 405
-    point2_x: 1990
-    point2_y: 408
-    point3_x: 1064
-    point3_y: 787
-    point4_x: 1990
-    point4_y: 787
+    Height: 1056
+    Width: 4500
+    point1_x: 1400
+    point1_y: 155
+    point2_x: 2100
+    point2_y: 155
+    point3_x: 1400
+    point3_y: 655
+    point4_x: 2100
+    point4_y: 655
   src:
-    point1_x: 2848
-    point1_y: 170
-    point2_x: 3156
-    point2_y: 177
-    point3_x: 2516
-    point3_y: 399
-    point4_x: 3425
-    point4_y: 398
+    point1_x: 1192
+    point1_y: 133
+    point2_x: 1298
+    point2_y: 135
+    point3_x: 1106
+    point3_y: 236
+    point4_x: 1291
+    point4_y: 248
 Image_4:
   Ins:
     Fx: 151.0
     Fy: 150.31
-    Height: 2337
-    Icx: 3002.0
+    Height: 1944
+    Icx: 1296.0
     Icy: 83.0
-    Width: 4000
-  dst:
-    Height: 1010
     Width: 2592
-    point1_x: 934
-    point1_y: 437
-    point2_x: 1666
-    point2_y: 442
-    point3_x: 926
-    point3_y: 787
-    point4_x: 1666
-    point4_y: 787
+  dst:
+    Height: 1107
+    Width: 2592
+    point1_x: 960
+    point1_y: 500
+    point2_x: 1660
+    point2_y: 500
+    point3_x: 960
+    point3_y: 900
+    point4_x: 1660
+    point4_y: 900
   src:
-    point1_x: 2916
+    point1_x: 1230
     point1_y: 127
-    point2_x: 3132
+    point2_x: 1350
     point2_y: 123
-    point3_x: 2794
-    point3_y: 258
-    point4_x: 3318
-    point4_y: 274
-camera_placement: corner
+    point3_x: 1167
+    point3_y: 251
+    point4_x: 1405
+    point4_y: 239
+camera_placement: center
 camera_used: 4

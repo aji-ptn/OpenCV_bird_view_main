@@ -1,16 +1,17 @@
 class ConfigurationImage2:
     def __init__(self, view_controller):
         self.view_controller = view_controller
+        self.view_controller.main_ui.doubleSpinBox_fy_1.setEnabled(False)
         self.connect_action()
 
     def connect_action(self):
         # ================== intrinsic parameter ==================
-        self.view_controller.main_ui.doubleSpinBox_fx_1.valueChanged.connect(self.change_intrinsic_from_ui)
-        self.view_controller.main_ui.doubleSpinBox_fy_1.valueChanged.connect(self.change_intrinsic_from_ui)
-        self.view_controller.main_ui.doubleSpinBox_icx_1.valueChanged.connect(self.change_intrinsic_from_ui)
-        self.view_controller.main_ui.doubleSpinBox_icy_1.valueChanged.connect(self.change_intrinsic_from_ui)
-        self.view_controller.main_ui.spinBox_width_1.valueChanged.connect(self.change_intrinsic_from_ui)
-        self.view_controller.main_ui.spinBox_height_1.valueChanged.connect(self.change_intrinsic_from_ui)
+        self.view_controller.main_ui.doubleSpinBox_fx_1.valueChanged.connect(self.change_intrinsic_from_ui_fx_fy)
+        self.view_controller.main_ui.doubleSpinBox_fy_1.valueChanged.connect(self.change_intrinsic_from_ui_fx_fy)
+        self.view_controller.main_ui.doubleSpinBox_icx_1.valueChanged.connect(self.change_intrinsic_from_ui_icx_icy_w_h)
+        self.view_controller.main_ui.doubleSpinBox_icy_1.valueChanged.connect(self.change_intrinsic_from_ui_icx_icy_w_h)
+        self.view_controller.main_ui.spinBox_width_1.valueChanged.connect(self.change_intrinsic_from_ui_icx_icy_w_h)
+        self.view_controller.main_ui.spinBox_height_1.valueChanged.connect(self.change_intrinsic_from_ui_icx_icy_w_h)
 
         # ================== src parameter ==================
         self.view_controller.main_ui.spinBox_src_point1_x_1.valueChanged.connect(self.change_properties_src_from_ui)
@@ -49,23 +50,40 @@ class ConfigurationImage2:
         self.view_controller.model.properties_image["Image_2"]["dst"] = {}
         self.change_properties_dst()
 
-    def change_intrinsic_from_ui(self):
+    def change_intrinsic_from_ui_fx_fy(self):
+        if self.view_controller.model.properties_image["Image_2"]["Ins"]["Fx"] is not None:
+            print("here")
+            deviation = self.view_controller.main_ui.doubleSpinBox_fx_1.value() - \
+                        self.view_controller.model.properties_image["Image_2"]["Ins"]["Fx"]
+            self.view_controller.model.properties_image["Image_2"]["Ins"]["Fy"] = self.view_controller.model.properties_image["Image_2"]["Ins"]["Fy"] - deviation
+            self.view_controller.model.properties_image["Image_2"]["Ins"]["Fx"] = self.view_controller.main_ui.doubleSpinBox_fx_1.value()
+            self.set_intrinsic_parameter_to_ui()
         self.change_properties_intrinsic()
         index = self.view_controller.main_ui.toolBox.currentIndex()
         self.view_controller.controller.process_perspective_image(index)
         self.view_controller.show_to_ui.show_image_current_calib()
+        self.view_controller.change_overlap_or_bird_view()
+
+    def change_intrinsic_from_ui_icx_icy_w_h(self):
+        self.change_properties_intrinsic()
+        index = self.view_controller.main_ui.toolBox.currentIndex()
+        self.view_controller.controller.process_perspective_image(index)
+        self.view_controller.show_to_ui.show_image_current_calib()
+        self.view_controller.change_overlap_or_bird_view()
 
     def change_properties_src_from_ui(self):
         self.change_properties_src()
         index = self.view_controller.main_ui.toolBox.currentIndex()
         self.view_controller.controller.process_perspective_image(index)
         self.view_controller.show_to_ui.show_image_current_calib()
+        self.view_controller.change_overlap_or_bird_view()
 
     def change_properties_dst_from_ui(self):
         self.change_properties_dst()
         index = self.view_controller.main_ui.toolBox.currentIndex()
         self.view_controller.controller.process_perspective_image(index)
         self.view_controller.show_to_ui.show_image_current_calib()
+        self.view_controller.change_overlap_or_bird_view()
 
     def load_config_from_file(self):
         self.set_intrinsic_parameter_to_ui()

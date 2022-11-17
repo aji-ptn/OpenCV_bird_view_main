@@ -3,9 +3,11 @@ class MainModel:
         super(MainModel, self).__init__()
 
         # data
-        self.__total_camera_used = None
+        self.__total_camera_used = 4
         self.__camera_placement = None
         self.__properties_image = {}
+        self.__calibration_image = {"matrix_k": [], "new_matrix_k": [], "dis_coefficient": [], "dimension": []}
+        self.__data_config = None
 
         # image
         self.__list_original_image = []
@@ -20,9 +22,12 @@ class MainModel:
 
         # video
         self.__list_frame_video = []
+        self.__list_frame_undistorted_video = []
         self.__list_perspective_video = []
         self.__list_union_original_video = []
         self.__bird_view_video = None
+        self.__properties_video = {"streaming": False, "mode": "overlap", "pos_frame": 0, "frame_count": 0, "total_minute": 0,
+                                   "total_second": 0, "current_minute": 0, "current_second": 0}
 
     # ===================================== data=====================================
     @property
@@ -48,6 +53,22 @@ class MainModel:
     @properties_image.setter
     def properties_image(self, value):
         self.__properties_image = value
+
+    @property
+    def data_config(self):
+        return self.__data_config
+
+    @data_config.setter
+    def data_config(self, value):
+        self.__data_config = value
+
+    @property
+    def calibration_image(self):
+        return self.__calibration_image
+
+    @calibration_image.setter
+    def calibration_image(self, value):
+        self.__calibration_image = value
 
     # ===================================== image =====================================
     @property
@@ -132,6 +153,14 @@ class MainModel:
         self.__list_frame_video = value
 
     @property
+    def list_frame_undistorted_video(self):
+        return self.__list_frame_undistorted_video
+
+    @list_frame_undistorted_video.setter
+    def list_frame_undistorted_video(self, value):
+        self.__list_frame_undistorted_video = value
+
+    @property
     def list_perspective_video(self):
         return self.__list_perspective_video
 
@@ -154,3 +183,23 @@ class MainModel:
     @bird_view_video.setter
     def bird_view_video(self, value):
         self.__bird_view_video = value
+
+    @property
+    def properties_video(self):
+        """
+            This function is for get properties video
+        Returns:
+            properties video
+        """
+        return self.__properties_video
+
+    @properties_video.setter
+    def properties_video(self, value):
+        """
+            This function us for set properties video
+        Args:
+            value: properties video
+        Returns:
+            None
+        """
+        self.__properties_video = value

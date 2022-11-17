@@ -10,6 +10,7 @@ class ShowToUi:
         self.width_union_image = 520
         self.width_preview_image = 520
         self.width_bird_view_image = 520
+        self.width_bird_view_video = 520
         self.connect()
 
     def connect(self):
@@ -93,3 +94,16 @@ class ShowToUi:
     def zoom_in_bird_view_image(self):
         self.width_bird_view_image += 100
         self.show_bird_view_image()
+
+    def zoom_out_bird_view_video(self):
+        self.width_bird_view_video -= 100
+        self.showing_video_result()
+
+    def zoom_in_bird_view_video(self):
+        self.width_bird_view_video += 100
+        self.showing_video_result()
+
+    def showing_video_result(self):
+        image = self.view_controller.model.bird_view_video
+        if image is not None:
+            show_image_to_label(self.view_controller.main_ui.wind_bird_view_video, image, self.width_bird_view_video)

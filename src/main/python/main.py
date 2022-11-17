@@ -11,7 +11,7 @@ import sys
 class App:
     def __init__(self, parent, appctxt):
         self.model = MainModel
-        self.controller = MainController(self.model)
+        self.controller = MainController(appctxt, self.model)
         self.view = MainView(parent, appctxt, self.model, self.controller)
         # self.view.show()
 
