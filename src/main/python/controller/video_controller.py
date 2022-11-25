@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import time
 
 
 class VideoController:
@@ -9,26 +10,9 @@ class VideoController:
 
         self.ret = []
         self.cap = []
-        self.main_controller.model.properties_video = {"streaming": False, "mode": "bird_view", "pos_frame": 0,
-                                                       "frame_count": 0,
-                                                       "total_minute": 0,
+        self.main_controller.model.properties_video = {"video": False, "streaming": False, "mode": "bird_view",
+                                                       "pos_frame": 0, "frame_count": 0, "total_minute": 0,
                                                        "total_second": 0, "current_minute": 0, "current_second": 0}
-        # print(self.main_controller.model.properties_video["mode"])
-        # self.record = False
-        # self.video_frame_anypoint = []
-        # self.map_x_panorama = []
-        # self.map_y_panorama = []
-        # self.map_x_reverse = []
-        # self.map_y_reverse = []
-        # self.map_x_anypoint = []
-        # self.map_y_anypoint = []
-
-        # self.total_minute = 0
-        # self.current_minute = 0
-        # self.total_second = 0
-        # self.current_sec = 0
-        # self.pos_frame = 0
-        # self.frame_count = 0
 
         # for record video
         self.start_record = None
@@ -59,57 +43,35 @@ class VideoController:
 
                     if all(self.ret):
                         self.main_controller.model.bird_view_video = \
-                            self.main_controller.process_bird_view(self.main_controller.model.properties_video["mode"],
-                                                                   "video")
+                            self.main_controller.process_bird_view("video")
                         self.__video_duration()
                         if self.record:
                             self.start_record.write(self.main_controller.model.bird_view_video)
 
     def load_maps_for_remap(self, image, i):
-        import time
         start_time = time.time()
         map_x = np.load(self.app_ctxt.get_resource("data_config/maps/map_x_" + str(i) + ".npy"))
         map_y = np.load(self.app_ctxt.get_resource("data_config/maps/map_y_" + str(i) + ".npy"))
         undistorted = cv2.remap(image, map_x, map_y,
                                 interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
         # cv2.imwrite("asdavascascasc_" + str(i) + "_.jpg", undistorted)
-        print("--- %s seconds ---" % (time.time() - start_time))
+        # print("--- %s seconds ---" % (time.time() - start_time))
         return undistorted
 
     def process_perspective_image(self, image, i):
-        import time
-        start_time = time.time()
-        print("process perspective image")
+        # start_time = time.time()
         keys = list(self.main_controller.model.properties_image)
         canvas = self.main_controller.model.properties_image[keys[i]]["dst"]["Width"], \
                  self.main_controller.model.properties_image[keys[i]]["dst"][
                      "Height"]
-        src = np.float32(
-            [[self.main_controller.model.properties_image[keys[i]]["src"]["point1_x"],
-              self.main_controller.model.properties_image[keys[i]]["src"]["point1_y"]],
-             [self.main_controller.model.properties_image[keys[i]]["src"]["point2_x"],
-              self.main_controller.model.properties_image[keys[i]]["src"]["point2_y"]],
-             [self.main_controller.model.properties_image[keys[i]]["src"]["point3_x"],
-              self.main_controller.model.properties_image[keys[i]]["src"]["point3_y"]],
-             [self.main_controller.model.properties_image[keys[i]]["src"]["point4_x"],
-              self.main_controller.model.properties_image[keys[i]]["src"]["point4_y"]]])
-        dst = np.float32(
-            [[self.main_controller.model.properties_image[keys[i]]["dst"]["point1_x"],
-              self.main_controller.model.properties_image[keys[i]]["dst"]["point1_y"]],
-             [self.main_controller.model.properties_image[keys[i]]["dst"]["point2_x"],
-              self.main_controller.model.properties_image[keys[i]]["dst"]["point2_y"]],
-             [self.main_controller.model.properties_image[keys[i]]["dst"]["point3_x"],
-              self.main_controller.model.properties_image[keys[i]]["dst"]["point3_y"]],
-             [self.main_controller.model.properties_image[keys[i]]["dst"]["point4_x"],
-              self.main_controller.model.properties_image[keys[i]]["dst"]["point4_y"]]])
-
-        matrix = cv2.getPerspectiveTransform(src, dst)
+        matrix = np.load(self.app_ctxt.get_resource("data_config/matrix/matrix_" + str(i) + ".npy"))
         perspective_image = cv2.warpPerspective(image, matrix, canvas)
-        print("--- %s seconds ---" % (time.time() - start_time))
+        # print("--- %s seconds ---" % (time.time() - start_time))
         return perspective_image
 
     def change_mode_overlap(self, mode):
         self.main_controller.model.properties_video["mode"] = mode
+        self.main_controller.update_bird_view_video()
 
     def stop_video(self):
         for i, cap in enumerate(self.cap):

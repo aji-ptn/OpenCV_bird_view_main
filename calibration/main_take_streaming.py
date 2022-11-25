@@ -38,7 +38,7 @@ class main_program():
         # self.cam2 = VStream("http://192.168.103.18:8000/stream.mjpg")
         # self.cam3 = VStream("http://192.168.103.211:8000/stream.mjpg")
         # self.cam4 = VStream("http://192.168.103.211:8000/stream.mjpg")
-        self.cam1 = VStream("http://10.42.0.170:8000/stream.mjpg")
+        self.cam1 = VStream("http://10.42.0.31:8000/stream.mjpg")
         # self.cam2 = VStream("http://10.42.0.251:8000/stream.mjpg")
         # self.cam3 = VStream("http://10.42.0.251:8000/stream.mjpg")
         # self.cam4 = VStream("http://10.42.0.251:8000/stream.mjpg")
@@ -74,7 +74,7 @@ class main_program():
                 exit(1)
                 break
             elif cv2.waitKey(90) == ord("a"):
-                cv2.imwrite("images/cam_1_" + str(self.num) + ".jpg", self.cam1.get_frame())
+                cv2.imwrite("images/cam_13_" + str(self.num) + ".jpg", self.cam1.get_frame())
                 # cv2.imwrite("images/image2.jpg", self.cam2.get_frame())
                 # cv2.imwrite("images/image3.jpg", self.cam3.get_frame())
                 # cv2.imwrite("images/image4.jpg", self.cam4.get_frame())

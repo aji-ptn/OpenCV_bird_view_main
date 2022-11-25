@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from .additional_function import read_image
@@ -6,6 +8,9 @@ from .merge_original_image import merge_original_image
 from .video_controller import VideoController
 import yaml
 from subprocess import call
+from .gradient_class import create_blending
+from .crop_gradient_center_config import crop_for_gradient_front_left, crop_for_gradient_front_right, \
+    crop_for_gradient_rear_left, crop_for_gradient_rear_right, crop_region
 
 
 class MainController:
@@ -54,9 +59,6 @@ class MainController:
         self.model.calibration_image["matrix_k"].append(K)
         self.model.calibration_image["dis_coefficient"].append(D)
         self.model.calibration_image["dimension"].append(dimension)
-        print("==============================")
-        print(self.model.calibration_image["dimension"])
-        print("==============================")
 
     def update_union_original_image(self):
         self.model.union_original_image = merge_original_image(self.model.list_original_image)
@@ -118,14 +120,11 @@ class MainController:
     def save_config_to_file(self, data):
         print("save")
         properties_image = self.model.properties_image
-        # properties_image["camera_used"] = self.model.total_camera_used
-        # properties_image["camera_placement"] = self.model.camera_placement
-        print(properties_image)
         with open(data, "w") as outfile:
             yaml.dump(properties_image, outfile, default_flow_style=False)
 
     def process_perspective_image(self, i):
-        print("process perspective image")
+        # start = time.time()
         keys = list(self.model.properties_image)
         canvas = self.model.properties_image[keys[i]]["dst"]["Width"], self.model.properties_image[keys[i]]["dst"][
             "Height"]
@@ -149,7 +148,23 @@ class MainController:
               self.model.properties_image[keys[i]]["dst"]["point4_y"]]])
 
         matrix = cv2.getPerspectiveTransform(src, dst)
-        self.model.list_perspective_image[i] = cv2.warpPerspective(self.model.list_undistorted_image[i], matrix, canvas)
+        # self.model.properties_image[keys[i]]["matrix"] = matrix
+        # self.model.list_perspective_image[i] = cv2.warpPerspective(self.model.list_undistorted_image[i],
+        #                                                            self.model.properties_image[keys[i]]["matrix"],
+        #                                                            canvas)
+        self.model.list_perspective_image[i] = cv2.warpPerspective(self.model.list_undistorted_image[i],
+                                                                   matrix,
+                                                                   canvas)
+
+        path_matrix = self.app_ctxt.get_resource("data_config/matrix/matrix_" + str(i) + ".npy")
+
+        np.save(path_matrix, matrix)
+
+        print("----------------")
+        # print(time.time() - start)
+        print("----------------")
+        # print(self.model.properties_image[keys[i]]["matrix"])
+
         self.draw_point_position("dst", keys, i)
 
     def draw_point_position(self, position, keys, i):
@@ -166,25 +181,25 @@ class MainController:
             image = None
             font_color = None
         cv2.circle(image, (self.model.properties_image[keys[i]][position]["point1_x"],
-                           self.model.properties_image[keys[i]][position]["point1_y"]), 20, (0, 0, 255), 5)
-        cv2.putText(image, '1', (self.model.properties_image[keys[i]][position]["point1_x"],
-                                 self.model.properties_image[keys[i]][position]["point1_y"]), font,
-                    5, font_color, 5, cv2.LINE_AA)
+                           self.model.properties_image[keys[i]][position]["point1_y"]), 20, (200, 0, 0), 5)
+        # cv2.putText(image, '1', (self.model.properties_image[keys[i]][position]["point1_x"],
+        #                          self.model.properties_image[keys[i]][position]["point1_y"]), font,
+        #             5, font_color, 5, cv2.LINE_AA)
         cv2.circle(image, (self.model.properties_image[keys[i]][position]["point2_x"],
-                           self.model.properties_image[keys[i]][position]["point2_y"]), 20, (0, 0, 255), 5)
-        cv2.putText(image, '2', (self.model.properties_image[keys[i]][position]["point2_x"],
-                                 self.model.properties_image[keys[i]][position]["point2_y"]), font,
-                    5, font_color, 5, cv2.LINE_AA)
+                           self.model.properties_image[keys[i]][position]["point2_y"]), 20, (0, 200, 0), 5)
+        # cv2.putText(image, '2', (self.model.properties_image[keys[i]][position]["point2_x"],
+        #                          self.model.properties_image[keys[i]][position]["point2_y"]), font,
+        #             5, font_color, 5, cv2.LINE_AA)
         cv2.circle(image, (self.model.properties_image[keys[i]][position]["point3_x"],
-                           self.model.properties_image[keys[i]][position]["point3_y"]), 20, (0, 0, 255), 5)
-        cv2.putText(image, '3', (self.model.properties_image[keys[i]][position]["point3_x"],
-                                 self.model.properties_image[keys[i]][position]["point3_y"]), font,
-                    5, font_color, 5, cv2.LINE_AA)
+                           self.model.properties_image[keys[i]][position]["point3_y"]), 20, (0, 200, 255), 5)
+        # cv2.putText(image, '3', (self.model.properties_image[keys[i]][position]["point3_x"],
+        #                          self.model.properties_image[keys[i]][position]["point3_y"]), font,
+        #             5, font_color, 5, cv2.LINE_AA)
         cv2.circle(image, (self.model.properties_image[keys[i]][position]["point4_x"],
-                           self.model.properties_image[keys[i]][position]["point4_y"]), 20, (0, 0, 255), 5)
-        cv2.putText(image, '4', (self.model.properties_image[keys[i]][position]["point4_x"],
-                                 self.model.properties_image[keys[i]][position]["point4_y"]), font,
-                    5, font_color, 5, cv2.LINE_AA)
+                           self.model.properties_image[keys[i]][position]["point4_y"]), 20, (200, 0, 255), 5)
+        # cv2.putText(image, '4', (self.model.properties_image[keys[i]][position]["point4_x"],
+        #                          self.model.properties_image[keys[i]][position]["point4_y"]), font,
+        #             5, font_color, 5, cv2.LINE_AA)
         if position == "dst":
             self.model.list_perspective_drawing_image[i] = image
         elif position == "src":
@@ -203,12 +218,22 @@ class MainController:
 
         return K, D, dimension
 
-    def process_bird_view(self, activation, image_sources):
+    def update_overlap_or_bird_view(self):
+        self.model.overlap_image = self.process_bird_view("image")
+        if self.model.properties_video["video"]:
+            self.model.bird_view_video = self.process_bird_view("video")
+
+    def update_bird_view_video(self):
+        self.model.bird_view_video = self.process_bird_view("video")
+
+    def process_bird_view(self, image_sources):
         if image_sources == "image":
             image = self.model.list_perspective_image
+            activation = self.model.gradient_image
         else:
             image = self.model.list_perspective_video
-        print("Bird view")
+            activation = self.model.properties_video["mode"]
+        # print("Bird view")
         image = [image[0],
                  cv2.rotate(image[1], cv2.ROTATE_90_COUNTERCLOCKWISE),
                  cv2.rotate(image[2], cv2.ROTATE_90_CLOCKWISE),
@@ -230,24 +255,26 @@ class MainController:
             canvas_bird_view[rear_limit:rear_limit + image[3].shape[0], 0:0 + image[3].shape[1]] = image[3]
             # self.model.overlap_image = canvas_bird_view
 
-            if activation == "overlap":
-                list_overlapping = self.transparency_bird_view(image, right_limit, rear_limit)
-                canvas_bird_view[0:0 + list_overlapping[0].shape[0], 0:0 + list_overlapping[0].shape[1]] = \
-                list_overlapping[0]  # front left
-                canvas_bird_view[rear_limit:rear_limit + list_overlapping[2].shape[0],
-                0:0 + list_overlapping[2].shape[1]] = list_overlapping[2]  # left rear
-                canvas_bird_view[0:0 + list_overlapping[1].shape[0],
-                right_limit:right_limit + list_overlapping[1].shape[1]] = list_overlapping[1]  # front right
-                canvas_bird_view[rear_limit:rear_limit + list_overlapping[3].shape[0],
-                image[3].shape[1] - image[2].shape[1]
-                : image[3].shape[1] - image[2].shape[1] +
-                  list_overlapping[3].shape[1]] = list_overlapping[3]  # right rear
-                # self.model.overlap_image = canvas_bird_view
-
-            else:
+            if activation == "bird_view":
                 canvas_bird_view = self.bird_view_combine_overlapping(image)
                 canvas_bird_view = cv2.cvtColor(canvas_bird_view, cv2.COLOR_BGRA2BGR)
-                # self.model.overlap_image = canvas_bird_view
+
+            else:
+                list_overlapping, pos_fr_le_x, pos_fr_le_y, pos_fr_ri_y, pos_rea_le_x \
+                    = self.find_overlap_gradient(image, right_limit, rear_limit, activation)
+
+                canvas_bird_view[pos_fr_le_y:pos_fr_le_y + list_overlapping[0].shape[0],
+                pos_fr_le_x:pos_fr_le_x + list_overlapping[0].shape[1]] = list_overlapping[0]  # front left
+
+                canvas_bird_view[rear_limit:rear_limit + list_overlapping[2].shape[0],
+                pos_rea_le_x:pos_rea_le_x + list_overlapping[2].shape[1]] = list_overlapping[2]  # left rear
+
+                canvas_bird_view[pos_fr_ri_y:pos_fr_ri_y + list_overlapping[1].shape[0],
+                right_limit:right_limit + list_overlapping[1].shape[1]] = list_overlapping[1]  # front right
+
+                canvas_bird_view[rear_limit:rear_limit + list_overlapping[3].shape[0],
+                image[3].shape[1] - image[2].shape[1]: image[3].shape[1] - image[2].shape[1] +
+                                                       list_overlapping[3].shape[1]] = list_overlapping[3]  # right rear
 
             return canvas_bird_view
 
@@ -291,33 +318,79 @@ class MainController:
         return res
 
     @classmethod
-    def transparency_bird_view(cls, image, right_limit, rear_limit):
-        print(image)
-        print(len(image))
+    def find_overlap_gradient(cls, image, right_limit, rear_limit, gradient_mode):
         image_overlap = [None] * len(image)
         crop_front_left = image[0][0:image[0].shape[0], 0:image[1].shape[1]]
         crop_left_front = image[1][0:image[0].shape[0], 0:image[1].shape[1]]
-        image_overlap[0] = cv2.addWeighted(crop_front_left, 0.5, crop_left_front, 0.5, 0)  # overlap_front_left
 
         crop_front_right = image[0][0:image[0].shape[0], right_limit:right_limit + image[2].shape[1]]
         crop_right_front = image[2][0:image[0].shape[0], 0:image[2].shape[1]]
-        image_overlap[1] = cv2.addWeighted(crop_front_right, 0.5, crop_right_front, 0.5, 0)  # overlap_front_right
 
         crop_left_rear = image[1][rear_limit:rear_limit + image[3].shape[0], 0:image[1].shape[1]]
         crop_rear_left = image[3][0:image[3].shape[0], 0:image[1].shape[1]]
-        image_overlap[2] = cv2.addWeighted(crop_left_rear, 0.5, crop_rear_left, 0.5, 0)  # overlap_left_rear
 
         crop_right_rear = image[2][rear_limit:rear_limit + image[3].shape[0], 0:image[2].shape[1]]
         crop_rear_right = image[3][0:image[3].shape[0], image[3].shape[1] - image[2].shape[1]:
                                                         image[3].shape[1] - image[2].shape[1] + image[3].shape[1]]
-        image_overlap[3] = cv2.addWeighted(crop_right_rear, 0.5, crop_rear_right, 0.5, 0)  # overlap_right_rear
+        pos_fr_le_x, pos_fr_le_y, pos_fr_ri_y, pos_rea_le_x = 0, 0, 0, 0
+        if gradient_mode == "O":
+            image_overlap[0] = cv2.addWeighted(crop_front_left, 0.5, crop_left_front, 0.5, 0)  # overlap_front_left
+            image_overlap[1] = cv2.addWeighted(crop_front_right, 0.5, crop_right_front, 0.5, 0)  # overlap_front_right
+            image_overlap[2] = cv2.addWeighted(crop_left_rear, 0.5, crop_rear_left, 0.5, 0)  # overlap_left_rear
+            image_overlap[3] = cv2.addWeighted(crop_right_rear, 0.5, crop_rear_right, 0.5, 0)  # overlap_right_rear
 
-        return image_overlap
+        else:
+            if gradient_mode == "D":  # front left  --------------------------------------------------------------------
+                pos_fr_le_x, pos_fr_le_y, crop_front_left, crop_left_front = crop_for_gradient_front_left(
+                    crop_front_left,
+                    crop_left_front)
+            time
+            front_left_ov = crop_region(crop_front_left, "front_left", gradient_mode)
+            left_front_ov = crop_region(crop_left_front, "left_front", gradient_mode)
+            try:
+                image_overlap[0] = create_blending(front_left_ov, left_front_ov)
+            except:
+                image_overlap[0] = cv2.addWeighted(crop_front_left, 0.5, crop_left_front, 0.5, 0)  # overlap_front_left
+
+            if gradient_mode == "D":  # front right  -------------------------------------------------------------------
+                _, pos_fr_ri_y, crop_front_right, crop_right_front = crop_for_gradient_front_right(crop_front_right,
+                                                                                                   crop_right_front)
+            front_right_ov = crop_region(crop_front_right, "front_right", gradient_mode)
+            right_front_ov = crop_region(crop_right_front, "right_front", gradient_mode)
+            try:
+                image_overlap[1] = create_blending(front_right_ov, right_front_ov)
+            except:
+                image_overlap[1] = cv2.addWeighted(crop_front_right, 0.5, crop_right_front, 0.5,
+                                                   0)  # overlap_front_right
+
+            if gradient_mode == "D":  # rear left  ---------------------------------------------------------------------
+                pos_rea_le_x, _, crop_left_rear, crop_rear_left = crop_for_gradient_rear_left(crop_left_rear,
+                                                                                              crop_rear_left)
+
+            image_overlap[2] = cv2.addWeighted(crop_left_rear, 0.5, crop_rear_left, 0.5, 0)  # overlap_left_rear
+
+            left_rear_ov = crop_region(crop_left_rear, "left_rear", gradient_mode)
+            rear_left_ov = crop_region(crop_rear_left, "rear_left", gradient_mode)
+            try:
+                image_overlap[2] = create_blending(left_rear_ov, rear_left_ov)
+            except:
+                image_overlap[2] = cv2.addWeighted(crop_left_rear, 0.5, crop_rear_left, 0.5, 0)  # overlap_left_rear
+
+            if gradient_mode == "D":  # rear right ---------------------------------------------------------------------
+                _, _, crop_right_rear, crop_rear_right = crop_for_gradient_rear_right(crop_right_rear, crop_rear_right)
+            right_rear_ov = crop_region(crop_right_rear, "right_rear", gradient_mode)
+            rear_right_ov = crop_region(crop_rear_right, "rear_right", gradient_mode)
+            try:
+                image_overlap[3] = create_blending(right_rear_ov, rear_right_ov)
+            except:
+                image_overlap[3] = cv2.addWeighted(crop_right_rear, 0.5, crop_rear_right, 0.5, 0)  # overlap_right_rear
+
+        return image_overlap, pos_fr_le_x, pos_fr_le_y, pos_fr_ri_y, pos_rea_le_x
 
     def crop_image(self, image, x, y):
         img = cv2.circle(image.copy(), (x, y), 2, (200, 5, 200), -1)
         img = img[y - 70: (y - 70) + 140, x - 70:(x - 70) + 140]
-        cv2.imwrite("img.jpg", img)
+        # cv2.imwrite("img.jpg", img)
         return img
 
     def get_data_position(self, i_image, data):
@@ -330,7 +403,7 @@ class MainController:
         self.model.properties_image[keys[i_image]]["src"]["point3_y"] = data[2][1]
         self.model.properties_image[keys[i_image]]["src"]["point4_x"] = data[3][0]
         self.model.properties_image[keys[i_image]]["src"]["point4_y"] = data[3][1]
-        print(self.model.properties_image[keys[i_image]]["src"])
+        # print(self.model.properties_image[keys[i_image]]["src"])
 
     def load_config_authentication(self, data_config):
         with open(data_config, "r") as file:
@@ -363,3 +436,7 @@ class MainController:
         with open(file, "w") as outfile:
             yaml.dump(self.authen, outfile, default_flow_style=False)
             print("save config success")
+
+    def change_mode_gradient_image(self, mode):
+        self.model.gradient_image = mode
+        self.model.overlap_image = self.process_bird_view("image")

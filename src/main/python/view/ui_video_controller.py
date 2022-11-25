@@ -43,10 +43,18 @@ class UiVideoController:
 
     def open_video_sources(self):
         self.view_controller.controller.video_controller.initialize_video_data()
+
+        filepath_video = ["/home/aji/Downloads/sequence_video/7/video_3 1668069965.1640372_.avi",
+                          "/home/aji/Downloads/sequence_video/7/video_2 1668069965.1640372_.avi",
+                          "/home/aji/Downloads/sequence_video/7/video_4 1668069965.1640372_.avi",
+                          "/home/aji/Downloads/sequence_video/7/video_1 1668069965.1640372_.avi"]
         for i in range(self.view_controller.model.total_camera_used):
-            filepath_video = select_file(None, "Select video", "", "*.avi *.mp4")
+            # filepath_video = select_file(None, "Select video", "", "*.avi *.mp4")
             if filepath_video:
-                self.view_controller.controller.video_controller.running_video(i, filepath_video)
+                self.view_controller.controller.video_controller.running_video(i, filepath_video[i])
+                # self.view_controller.controller.video_controller.running_video(i, filepath_video)
+                if len(filepath_video) == 4:
+                    self.view_controller.model.properties_video["video"] = True
             else:
                 break
         self.showing_to_ui()
@@ -105,6 +113,5 @@ class UiVideoController:
             mode = "D"
         else:
             mode = "O"
-        print(mode)
         self.view_controller.controller.video_controller.change_mode_overlap(mode)
         self.view_controller.show_to_ui.showing_video_result()

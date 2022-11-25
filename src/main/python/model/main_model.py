@@ -5,6 +5,7 @@ class MainModel:
         # data
         self.__total_camera_used = 4
         self.__camera_placement = None
+        self.__gradient_image = "O"
         self.__properties_image = {}
         self.__calibration_image = {"matrix_k": [], "new_matrix_k": [], "dis_coefficient": [], "dimension": []}
         self.__data_config = None
@@ -26,8 +27,8 @@ class MainModel:
         self.__list_perspective_video = []
         self.__list_union_original_video = []
         self.__bird_view_video = None
-        self.__properties_video = {"streaming": False, "mode": "overlap", "pos_frame": 0, "frame_count": 0, "total_minute": 0,
-                                   "total_second": 0, "current_minute": 0, "current_second": 0}
+        self.__properties_video = {"video": False, "streaming": False, "mode": "O", "pos_frame": 0, "frame_count": 0,
+                                   "total_minute": 0, "total_second": 0, "current_minute": 0, "current_second": 0}
 
     # ===================================== data=====================================
     @property
@@ -45,6 +46,14 @@ class MainModel:
     @camera_placement.setter
     def camera_placement(self, value):
         self.__camera_placement = value
+
+    @property
+    def gradient_image(self):
+        return self.__gradient_image
+
+    @gradient_image.setter
+    def gradient_image(self, value):
+        self.__gradient_image = value
 
     @property
     def properties_image(self):

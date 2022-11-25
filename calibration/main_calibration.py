@@ -15,7 +15,8 @@ _img_shape = None
 objpoints = []  # 3d point in real world space
 imgpoints = []  # 2d points in image plane.
 # images = glob.glob('/home/aji/Documents/MyGithub/create-dataset-birds-view/images/entaniya_1_more/*.jpg')
-images = glob.glob('/home/aji/Documents/MyGithub/OpenCV_bird_view_main/calibration/images/*.jpg')
+# images = glob.glob('/home/aji/Documents/MyGithub/OpenCV_bird_view_main/calibration/images/*.jpg')
+images = glob.glob('/home/aji/Documents/MyGithub/OpenCV_bird_view_main/calibration/images/cam_13/*.jpg')
 print(images)
 
 for fname in images:
@@ -66,7 +67,7 @@ print("D=np.array(" + str(D.tolist()) + ")")
 
 
 def save_data():
-    fs = cv2.FileStorage("entaniya_1_more_.yaml", cv2.FILE_STORAGE_WRITE)
+    fs = cv2.FileStorage("entaniya_13_new_11192022.yaml", cv2.FILE_STORAGE_WRITE)
     fs.write("camera_matrix", K)
     fs.write("dist_coeffs", D)
     fs.write("resolution", np.int32(gray.shape[::-1]))

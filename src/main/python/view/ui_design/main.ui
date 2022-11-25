@@ -744,7 +744,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>355</width>
+                 <width>335</width>
                  <height>529</height>
                 </rect>
                </property>
@@ -1343,7 +1343,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>355</width>
+                 <width>335</width>
                  <height>529</height>
                 </rect>
                </property>
@@ -1942,7 +1942,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>355</width>
+                 <width>335</width>
                  <height>529</height>
                 </rect>
                </property>
@@ -2825,7 +2825,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tab_original">
         <attribute name="title">
@@ -2842,8 +2842,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>521</width>
-              <height>835</height>
+              <width>330</width>
+              <height>38</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -2913,8 +2913,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>521</width>
-              <height>835</height>
+              <width>330</width>
+              <height>38</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -2984,11 +2984,56 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
-             <widget class="QCheckBox" name="checkBox_show_overlapping">
-              <property name="text">
-               <string>Overlap</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_19">
+              <item>
+               <layout class="QGridLayout" name="gridLayout_19">
+                <item row="0" column="1">
+                 <widget class="QRadioButton" name="radioButton_vertical_image">
+                  <property name="text">
+                   <string>Vertical</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QRadioButton" name="radioButton_overlap_image">
+                  <property name="text">
+                   <string>Overlap</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QRadioButton" name="radioButton_diagonal_image">
+                  <property name="text">
+                   <string>Diagonal</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QRadioButton" name="radioButton_horizontal_image">
+                  <property name="text">
+                   <string>Horizontal</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_16">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </item>
             <item>
              <widget class="QScrollArea" name="scrollArea_4">
@@ -3001,7 +3046,7 @@
                  <x>0</x>
                  <y>0</y>
                  <width>501</width>
-                 <height>786</height>
+                 <height>753</height>
                 </rect>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -3135,20 +3180,6 @@
           <layout class="QHBoxLayout" name="horizontalLayout_17">
            <item>
             <layout class="QGridLayout" name="gridLayout_18">
-             <item row="0" column="0">
-              <widget class="QRadioButton" name="radioButton_horizontal_video">
-               <property name="text">
-                <string>Horizontal</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QRadioButton" name="radioButton_diagonal_video">
-               <property name="text">
-                <string>Diagonal</string>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="1">
               <widget class="QRadioButton" name="radioButton_vertical_video">
                <property name="text">
@@ -3161,16 +3192,26 @@
                <property name="text">
                 <string>Overlap</string>
                </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QRadioButton" name="radioButton_diagonal_video">
+               <property name="text">
+                <string>Diagonal</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QRadioButton" name="radioButton_horizontal_video">
+               <property name="text">
+                <string>Horizontal</string>
+               </property>
               </widget>
              </item>
             </layout>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_show_overlap_video">
-             <property name="text">
-              <string>Overlap</string>
-             </property>
-            </widget>
            </item>
            <item>
             <spacer name="horizontalSpacer_15">

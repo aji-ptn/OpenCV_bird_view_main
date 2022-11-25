@@ -55,7 +55,7 @@ class ConfigurationImage1:
             print("here")
             deviation = self.view_controller.main_ui.doubleSpinBox_fx_0.value() - \
                         self.view_controller.model.properties_image["Image_1"]["Ins"]["Fx"]
-            self.view_controller.model.properties_image["Image_1"]["Ins"]["Fy"] = self.view_controller.model.properties_image["Image_1"]["Ins"]["Fy"] - deviation
+            self.view_controller.model.properties_image["Image_1"]["Ins"]["Fy"] = self.view_controller.model.properties_image["Image_1"]["Ins"]["Fy"] + deviation
             self.view_controller.model.properties_image["Image_1"]["Ins"]["Fx"] = self.view_controller.main_ui.doubleSpinBox_fx_0.value()
             self.set_intrinsic_parameter_to_ui()
         self.change_properties_intrinsic()

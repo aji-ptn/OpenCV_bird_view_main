@@ -38,30 +38,10 @@ class MainView(QMainWindow):
         self.add_label_zoom()
         self.connect()
 
-    def hide(self):
-        self.main_ui.toolBox.setItemEnabled(4, False)
-        self.main_ui.toolBox.setItemEnabled(5, False)
-        # self.main_ui.label_38.hide()
-        # self.main_ui.spinBox_shift_x_1.hide()
-        # self.main_ui.label_40.hide()
-        # self.main_ui.spinBox_shift_y_1.hide()
-        # self.main_ui.label_41.hide()
-        # self.main_ui.spinBox_shift_x_2.hide()
-        # self.main_ui.label_42.hide()
-        # self.main_ui.spinBox_shift_y_2.hide()
-        # self.main_ui.label_219.hide()
-        # self.main_ui.spinBox_shift_x_3.hide()
-        # self.main_ui.label_220.hide()
-        # self.main_ui.spinBox_shift_y_3.hide()
-        # self.main_ui.label_223.hide()
-        # self.main_ui.spinBox_shift_x_5.hide()
-        # self.main_ui.label_224.hide()
-        # self.main_ui.spinBox_shift_y_5.hide()
-
     def connect(self):
         self.main_ui.button_open_image.clicked.connect(self.open_image)
         self.main_ui.toolBox.currentChanged.connect(self.activate_toolbox)
-        self.main_ui.checkBox_show_overlapping.clicked.connect(self.change_overlap_or_bird_view)
+        # self.main_ui.checkBox_show_overlapping.clicked.connect(self.change_overlap_or_bird_view)
         self.main_ui.wind_show_undistortion_point.mouseMoveEvent = self.mouse_event_move
         # self.main_ui.wind_show_undistortion_point.mousePressEvent = self.mouse_event_click
         self.main_ui.wind_show_undistortion_point.mousePressEvent = self.get_position_in_image
@@ -71,6 +51,11 @@ class MainView(QMainWindow):
         self.main_ui.button_select_point_2.clicked.connect(lambda: self.onclick_select_point(2))
         self.main_ui.button_select_point_3.clicked.connect(lambda: self.onclick_select_point(3))
 
+        self.main_ui.radioButton_horizontal_image.clicked.connect(self.onclick_mode_gradient_image)
+        self.main_ui.radioButton_vertical_image.clicked.connect(self.onclick_mode_gradient_image)
+        self.main_ui.radioButton_diagonal_image.clicked.connect(self.onclick_mode_gradient_image)
+        self.main_ui.radioButton_overlap_image.clicked.connect(self.onclick_mode_gradient_image)
+
         self.main_ui.button_clear_0.clicked.connect(self.onclick_clear_point)
         self.main_ui.button_clear_1.clicked.connect(self.onclick_clear_point)
         self.main_ui.button_clear_2.clicked.connect(self.onclick_clear_point)
@@ -78,35 +63,89 @@ class MainView(QMainWindow):
 
         # self.wind_undistortion_left.wheelEvent = self.mouse_event.mouse_wheelEvent_left
 
-    def open_image(self):
+    def open_image(self):  # for fast input only. the use one in bellow function
         self.model.total_camera_used = 4
         self.check_authentication()
         self.controller.initial_properties()
         self.calib_properties.update_config()
         QMessageBox.information(None, "Information", "Select Source and parameter Image\nImage front -> left -> right "
                                                      "-> rear")
+
+        # data taken in 111912022
+        # path_image = ["/home/aji/Documents/MyGithub/OpenCV_bird_view_main/11192022/123/image3.jpg",
+        #               "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/11192022/123/image2.jpg",
+        #               "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/11192022/123/image4.jpg",
+        #               "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/11192022/123/image1.jpg"]
+        #
+        # path_parameter = ["/home/aji/Documents/MyGithub/OpenCV_bird_view_main/for_sequence/front_entaniya_12_.yaml",
+        #               "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/for_sequence/left_entaniya_4_.yaml",
+        #               "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/calibration/entaniya_11.yaml",
+        #               "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/calibration/entaniya_13_new_11192022.yaml"]
+        #
+        path_image = ["/home/aji/Documents/MyGithub/OpenCV_bird_view_main/1/front_true_.jpg",
+                      "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/1/left_true_.jpg",
+                      "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/1/right_true_.jpg",
+                      "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/1/back_true_.jpg"]
+        path_parameter = ["/home/aji/Documents/MyGithub/OpenCV_bird_view_main/1/front.yaml",
+                          "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/1/left.yaml",
+                          "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/1/right.yaml",
+                          "/home/aji/Documents/MyGithub/OpenCV_bird_view_main/1/rear.yaml"]
+
         for i in range(self.model.total_camera_used):
-            path_image = select_file(None, "Select image !", "../", "Image file (*.jpeg *.jpg *.png)")
+            # path_image = select_file(None, "Select image !", "../", "Image file (*.jpeg *.jpg *.png)")
+            #
+            # if path_image:
+            #     path_parameter = select_file(None, "Select Parameter !", "../", "Parameter Files (*.yaml)")
 
-            if path_image:
-                path_parameter = select_file(None, "Select Parameter !", "../", "Parameter Files (*.yaml)")
-
-                if path_parameter:
-                    self.controller.list_intrinsic_data(path_parameter)
-                    self.controller.list_image_data(path_image, i)
-                    if self.model.data_config is None:
-                        self.controller.update_intrinsic_parameter(i)
-                    self.controller.process_undistorted_image(i)
-                    self.controller.process_perspective_image(i)
-                    self.show_to_ui.show_union_original_image()
-                    self.show_to_ui.show_image_current_calib()
-        try:
-            self.model.overlap_image = self.controller.process_bird_view("bird_view", "image")
-            self.show_to_ui.show_bird_view_image()
-        except:
-            pass
+            if path_parameter:
+                self.controller.list_intrinsic_data(path_parameter[i])
+                self.controller.list_image_data(path_image[i], i)
+                if self.model.data_config is None:
+                    self.controller.update_intrinsic_parameter(i)
+                self.controller.process_undistorted_image(i)
+                self.controller.process_perspective_image(i)
+                self.show_to_ui.show_union_original_image()
+                self.show_to_ui.show_image_current_calib()
+        # try:
+        self.onclick_mode_gradient_image()
+        # self.model.overlap_image = self.controller.process_bird_view("image")
+        # self.show_to_ui.show_bird_view_image()
+        # except:
+        #     pass
         self.calib_properties.set_intrinsic_parameter_to_ui()
+        print("=------------------------------------")
         print(self.model.properties_image)
+        print("=------------------------------------")
+
+    # def open_image(self):  # function that program use
+    #     self.model.total_camera_used = 4
+    #     self.check_authentication()
+    #     self.controller.initial_properties()
+    #     self.calib_properties.update_config()
+    #     QMessageBox.information(None, "Information", "Select Source and parameter Image\nImage front -> left -> right "
+    #                                                  "-> rear")
+    #     for i in range(self.model.total_camera_used):
+    #         path_image = select_file(None, "Select image !", "../", "Image file (*.jpeg *.jpg *.png)")
+    #
+    #         if path_image:
+    #             path_parameter = select_file(None, "Select Parameter !", "../", "Parameter Files (*.yaml)")
+    #
+    #             if path_parameter:
+    #                 self.controller.list_intrinsic_data(path_parameter)
+    #                 self.controller.list_image_data(path_image, i)
+    #                 if self.model.data_config is None:
+    #                     self.controller.update_intrinsic_parameter(i)
+    #                 self.controller.process_undistorted_image(i)
+    #                 self.controller.process_perspective_image(i)
+    #                 self.show_to_ui.show_union_original_image()
+    #                 self.show_to_ui.show_image_current_calib()
+    #     try:
+    #         self.model.overlap_image = self.controller.process_bird_view("bird_view", "image")
+    #         self.show_to_ui.show_bird_view_image()
+    #     except:
+    #         pass
+    #     self.calib_properties.set_intrinsic_parameter_to_ui()
+    #     print(self.model.properties_image)
 
     def check_authentication(self):
         self.controller.load_config_authentication(self.config_path_authentication)
@@ -119,11 +158,11 @@ class MainView(QMainWindow):
                 status = self.controller.authentication(source_cam.password)
                 if status:
                     self.controller.save_config_authentication(source_cam.password, self.config_path_authentication)
-                    print("done")
+                    # print("done")
 
     def activate_toolbox(self):
         index = self.main_ui.toolBox.currentIndex()
-        print(index)
+        # print(index)
         try:
             if self.model.list_original_image:
                 self.show_to_ui.show_image_current_calib()
@@ -131,11 +170,10 @@ class MainView(QMainWindow):
             print("pass")
 
     def change_overlap_or_bird_view(self):
-        if self.main_ui.checkBox_show_overlapping.isChecked():
-            self.model.overlap_image = self.controller.process_bird_view("overlap", "image")
-        else:
-            self.model.overlap_image = self.controller.process_bird_view("bird_view", "image")
+        self.controller.update_overlap_or_bird_view()
         self.show_to_ui.show_bird_view_image()
+        if self.model.properties_video["video"]:
+            self.show_to_ui.showing_video_result()
 
     def add_label_zoom(self):
         self.add_label = QLabel(self.main_ui.wind_show_undistortion_point)
@@ -143,12 +181,6 @@ class MainView(QMainWindow):
         self.add_label.setFrameShape(QLabel.Shape.Box)
         self.add_label.setFrameShadow(QLabel.Shadow.Raised)
         self.add_label.hide()
-
-    # def mouse_event_click(self, e):
-    #     if e.button() == QtCore.Qt.MouseButton.LeftButton:
-    #         pos_x = round(e.x())
-    #         pos_y = round(e.y())
-    #         print(pos_x, pos_y)
 
     def mouse_event_move(self, e):
         index = self.main_ui.toolBox.currentIndex()
@@ -192,7 +224,7 @@ class MainView(QMainWindow):
                 pass
 
     def get_position_in_image(self, e):
-        print("here")
+        # print("here")
         # data = []
         index = self.main_ui.toolBox.currentIndex()
         ratio_x, ratio_y = init_ori_ratio(self.main_ui.wind_show_undistortion_point,
@@ -204,7 +236,6 @@ class MainView(QMainWindow):
                 coordinate = [pos_x, pos_y]
                 self.data.append(coordinate)
                 if len(self.data) == 4:
-                    print(self.data)
                     self.disable_button_select_point()
                     self.controller.get_data_position(index, self.data)
                     self.list_add_value_src_to_ui[index].set_properties_src_to_ui()
@@ -226,3 +257,39 @@ class MainView(QMainWindow):
             self.data.append([0, 0])
         self.controller.get_data_position(index, self.data)
         self.list_add_value_src_to_ui[index].set_properties_src_to_ui()
+
+    def onclick_mode_gradient_image(self):
+        if self.main_ui.radioButton_horizontal_image.isChecked():
+            mode = "H"
+        elif self.main_ui.radioButton_vertical_image.isChecked():
+            mode = "V"
+        elif self.main_ui.radioButton_diagonal_image.isChecked():
+            mode = "D"
+        else:
+            mode = "O"
+        print(mode)
+        self.controller.change_mode_gradient_image(mode)
+        self.show_to_ui.show_bird_view_image()
+
+    def hide(self):
+        print("heree")
+        self.main_ui.toolBox.setItemEnabled(4, False)
+        self.main_ui.toolBox.setItemEnabled(5, False)
+        self.main_ui.checkBox_show_overlapping.hide()
+        self.main_ui.tabWidget_bird_view_video.setTabVisible(3, False)
+        # self.main_ui.label_38.hide()
+        # self.main_ui.spinBox_shift_x_1.hide()
+        # self.main_ui.label_40.hide()
+        # self.main_ui.spinBox_shift_y_1.hide()
+        # self.main_ui.label_41.hide()
+        # self.main_ui.spinBox_shift_x_2.hide()
+        # self.main_ui.label_42.hide()
+        # self.main_ui.spinBox_shift_y_2.hide()
+        # self.main_ui.label_219.hide()
+        # self.main_ui.spinBox_shift_x_3.hide()
+        # self.main_ui.label_220.hide()
+        # self.main_ui.spinBox_shift_y_3.hide()
+        # self.main_ui.label_223.hide()
+        # self.main_ui.spinBox_shift_x_5.hide()
+        # self.main_ui.label_224.hide()
+        # self.main_ui.spinBox_shift_y_5.hide()
